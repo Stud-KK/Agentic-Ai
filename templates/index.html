@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Task Planner & Executor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .examples-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .example-btn {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .example-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .result-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            color: #333;
+            word-break: break-word;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .step-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .step-status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .step-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .step-details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tools-section {
+            margin-top: 30px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .tool-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .tool-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Agentic AI Task Planner & Executor</h1>
+            <p>Autonomous task planning and execution system</p>
+        </div>
+
+        <div class="main-card">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="taskInput">Enter Your Task:</label>
+                    <textarea id="taskInput" placeholder="Example: Write a file named 'test.txt' containing 'Hello World'"></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" id="executeBtn" onclick="executeTask()">Execute Task</button>
+                    <button class="btn-secondary" onclick="clearResults()">Clear</button>
+                    <button class="btn-secondary" onclick="loadExamples()">Load Examples</button>
+                    <button class="btn-secondary" onclick="loadTools()">Show Tools</button>
+                </div>
+            </div>
+
+            <div class="examples-section" id="examplesSection" style="display: none;">
+                <label>Example Tasks (Click to use):</label>
+                <div class="examples-grid" id="examplesGrid"></div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Planning and executing your task...</p>
+        </div>
+
+        <div class="main-card result-section" id="resultSection">
+            <h2>Execution Results</h2>
+            <div id="resultContent"></div>
+        </div>
+
+        <div class="main-card tools-section" id="toolsSection" style="display: none;">
+            <h2>Available Tools</h2>
+            <div class="tools-grid" id="toolsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        async function executeTask() {
+            const taskInput = document.getElementById('taskInput');
+            const task = taskInput.value.trim();
+            
+            if (!task) {
+                alert('Please enter a task!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('executeBtn').disabled = true;
+
+            try {
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ task: task })
+                });
+
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                displayError('Error executing task: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('executeBtn').disabled = false;
+            }
+        }
+
+        function displayResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            const resultSection = document.getElementById('resultSection');
+            
+            let html = '';
+
+            if (result.success) {
+                html += '<div class="status-badge status-success">✅ Task Completed Successfully</div>';
+            } else {
+                html += '<div class="status-badge status-failed">❌ Task Failed</div>';
+            }
+
+            html += '<div class="result-details">';
+            
+            // Basic info
+            html += '<div class="result-item">';
+            html += '<div class="result-label">Task:</div>';
+            html += '<div class="result-value">' + escapeHtml(result.task) + '</div>';
+            html += '</div>';
+
+            html += '<div class="result-item">';
+            html += '<div class="result-label">Iterations:</div>';
+            html += '<div class="result-value">' + result.iterations + '</div>';
+            html += '</div>';
+
+            // Steps
+            if (result.final_result && result.final_result.steps) {
+                html += '<div class="result-item">';
+                html += '<div class="result-label">Execution Steps:</div>';
+                html += '<ul class="steps-list">';
+                
+                result.final_result.steps.forEach((step, index) => {
+                    html += '<li class="step-item">';
+                    html += '<div class="step-header">';
+                    html += '<span class="step-title">Step ' + step.step_id + ': ' + escapeHtml(step.description) + '</span>';
+                    html += '<span class="step-status ' + step.status + '">' + step.status.toUpperCase() + '</span>';
+                    html += '</div>';
+                    html += '<div class="step-details">';
+                    html += 'Tool: <strong>' + step.tool + '</strong>';
+                    if (step.result) {
+                        if (step.result.success) {
+                            if (step.result.content) {
+                                html += '<br>Content: ' + escapeHtml(step.result.content.substring(0, 200));
+                            }
+                            if (step.result.result !== undefined) {
+                                html += '<br>Result: ' + step.result.result;
+                            }
+                        } else {
+                            html += '<br><span style="color: #dc3545;">Error: ' + escapeHtml(step.result.error || 'Unknown error') + '</span>';
+                        }
+                    }
+                    html += '</div>';
+                    html += '</li>';
+                });
+                
+                html += '</ul>';
+                html += '</div>';
+            }
+
+            // Summary
+            if (result.final_result) {
+                html += '<div class="result-item">';
+                html += '<div class="result-label">Summary:</div>';
+                html += '<div class="result-value">';
+                html += 'Completed: ' + result.final_result.completed + ' / ' + result.final_result.total_steps + ' steps';
+                if (result.final_result.failed > 0) {
+                    html += '<br>Failed: ' + result.final_result.failed + ' steps';
+                }
+                html += '</div>';
+                html += '</div>';
+            }
+
+            html += '</div>';
+            
+            resultContent.innerHTML = html;
+            resultSection.classList.add('show');
+        }
+
+        function displayError(message) {
+            const resultContent = document.getElementById('resultContent');
+            const resultSection = document.getElementById('resultSection');
+            
+            resultContent.innerHTML = '<div class="error-message">' + escapeHtml(message) + '</div>';
+            resultSection.classList.add('show');
+        }
+
+        function clearResults() {
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('taskInput').value = '';
+        }
+
+        async function loadExamples() {
+            try {
+                const response = await fetch('/api/examples');
+                const data = await response.json();
+                
+                const examplesGrid = document.getElementById('examplesGrid');
+                examplesGrid.innerHTML = '';
+                
+                data.examples.forEach(example => {
+                    const btn = document.createElement('button');
+                    btn.className = 'example-btn';
+                    btn.innerHTML = '<strong>' + example.title + '</strong><br><small>' + escapeHtml(example.task.substring(0, 50)) + '...</small>';
+                    btn.onclick = () => {
+                        document.getElementById('taskInput').value = example.task;
+                        document.getElementById('examplesSection').style.display = 'none';
+                    };
+                    examplesGrid.appendChild(btn);
+                });
+                
+                document.getElementById('examplesSection').style.display = 'block';
+            } catch (error) {
+                alert('Error loading examples: ' + error.message);
+            }
+        }
+
+        async function loadTools() {
+            try {
+                const response = await fetch('/api/tools');
+                const data = await response.json();
+                
+                const toolsGrid = document.getElementById('toolsGrid');
+                toolsGrid.innerHTML = '';
+                
+                data.tools.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'tool-card';
+                    card.innerHTML = '<div class="tool-name">' + tool.name + '</div><div class="tool-desc">' + escapeHtml(tool.description) + '</div>';
+                    toolsGrid.appendChild(card);
+                });
+                
+                document.getElementById('toolsSection').style.display = 'block';
+            } catch (error) {
+                alert('Error loading tools: ' + error.message);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Allow Enter key to execute (Ctrl+Enter)
+        document.getElementById('taskInput').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                executeTask();
+            }
+        });
+    </script>
+</body>
+</html>
+
